@@ -2,7 +2,7 @@
 DGRT, CPK, Gauss-Bell, and Top Issues information charts
 # Production Dashboard with Gaussian Analysis
 
-![Dashboard Preview](https://user-images.githubusercontent.com/your-image-path-here.png) <!-- Add a screenshot if available -->
+![Dashboard Preview](https://github.com/surielPRO/HisenseChartsQM/blob/main/CAptura%20dash%20board.png) <!-- Add a screenshot if available -->
 
 ## Overview
 A real-time production monitoring dashboard featuring:
