@@ -1,0 +1,315 @@
+.dashboard {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #121212;
+  color: white;
+  font-family: 'Arial', sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(25, 25, 25, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%);
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 225, 255, 0.7);
+}
+
+/* Estilos para la actualización automática */
+.last-updated {
+  text-align: center;
+  margin: 10px 0 20px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.refresh-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.refresh-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* Indicadores de carga y error */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  background: rgba(255, 50, 50, 0.2);
+  padding: 15px;
+  border-radius: 4px;
+  margin: 10px auto 20px;
+  max-width: 80%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-left: 4px solid rgba(255, 50, 50, 0.5);
+}
+
+.error-message button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: center;
+}
+
+.error-message button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Tarjetas de contenido */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.glass-card h3 {
+  margin: 0 0 12px 0;
+  color: #4ff7f7;
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+  text-shadow: 0 0 8px rgba(79, 247, 247, 0.3);
+}
+
+.chart-container {
+  width: 100%;
+  height: 100%;
+}
+
+.no-data {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+}
+
+/* Layout */
+.charts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.second-row, .third-row {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.second-row > .glass-card, 
+.third-row > .glass-card {
+  flex: 1;
+}
+
+/* Efecto LED mejorado */
+.active-border {
+  box-shadow: 0 0 0 2px #00fffc, 0 0 15px rgba(0, 255, 252, 0.4);
+  animation: led-pulse 2s infinite ease-in-out;
+  position: relative;
+  z-index: 1;
+}
+
+.active-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 7px;
+  background: linear-gradient(135deg, rgba(0, 255, 252, 0.1) 0%, transparent 100%);
+  z-index: -1;
+}
+
+@keyframes led-pulse {
+  0% {
+    box-shadow: 0 0 0 2px #00fffc, 0 0 10px rgba(0, 255, 252, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 4px #00fffc, 0 0 25px rgba(0, 255, 252, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 0 2px #00fffc, 0 0 10px rgba(0, 255, 252, 0.3);
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Estilos específicos para la campana de Gauss */
+.gauss-chart .stats-display {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.gauss-chart .stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 0.8rem;
+}
+
+.gauss-chart .stat-value {
+  font-weight: bold;
+  color: #4ff7f7;
+}
+
+/* Mejoras para tablas */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: rgba(0, 100, 200, 0.3) !important;
+  backdrop-filter: blur(5px);
+}
+
+tr {
+  transition: background 0.2s ease;
+}
+
+tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .second-row, .third-row {
+    flex-direction: column;
+  }
+  
+  .second-row > .glass-card,
+  .third-row > .glass-card {
+    height: 250;
+    min-height: 280px;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .content {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 10px;
+  }
+  
+  .title {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+  
+  .glass-card {
+    padding: 12px;
+  }
+  
+  .last-updated {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
