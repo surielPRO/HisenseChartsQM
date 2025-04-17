@@ -81,7 +81,8 @@ const ChartComponent = ({ data, dataKey, color, multiLineKeys = [], colors = [] 
               dot={{ r: 3 }}
               name={key === 'dayShift' ? 'Turno Día' : 
                     key === 'nightShift' ? 'Turno Noche' : 
-                    key === 'tgt' ? 'Meta' : key}
+                    key === 'tgt' ? 'Meta' : 
+                    key === 'dgrt' ? 'DGTR' : key}
             >
               <LabelList
                 dataKey={key}
