@@ -483,7 +483,9 @@ const gaussian = (x, mean, stdDev) => {
              <div className="chart-container" style={{ height: '120px' }}>
              <ChartComponent 
                data={dataInjection} 
-               dataKey="dgrt"
+               
+               multiLineKeys={["dgrt"]}
+               colors={['#4fc3f7']}
                stroke="rgba(255, 255, 255, 0.8)"
                showValues={true}
                valueFormatter={(value) => `${(value * 100).toFixed(2)}%`}
