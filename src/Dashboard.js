@@ -445,7 +445,7 @@ const gaussian = (x, mean, stdDev) => {
       <div className="overlay"></div>
       
       <div className="content">
-        <div className="title">DASHBOARD DE PRODUCCIÓN</div>
+        <div className="title">QUALITY DASHBOARD</div>
         
         {/* Indicador de última actualización */}
         {lastUpdated && (
@@ -674,7 +674,8 @@ const gaussian = (x, mean, stdDev) => {
             <div>
               <p><strong>Target:</strong> 900.20</p>
               <p><strong>CPK:</strong> {cpk.toFixed(2)}</p>
-              <p><strong>Fuera de Spec:</strong> {outOfSpecCount}</p>
+              {/* <p><strong>Fuera de Spec:</strong> {outOfSpecCount}</p> */}
+              
             </div>
           </div>
         </div>
