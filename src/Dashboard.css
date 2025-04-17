@@ -2,13 +2,25 @@
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background-color: #121212;
+  background-color: #003eff;
   color: white;
   font-family: 'Arial', sans-serif;
   padding: 20px;
   box-sizing: border-box;
 }
+.recharts-reference-line-line {
+  opacity: 0.8;
+}
 
+/* Para los puntos de datos reales */
+.recharts-dot {
+  filter: drop-shadow(0 0 2px rgba(255, 235, 59, 0.7));
+}
+
+/* Para las etiquetas de texto */
+.recharts-label {
+  text-shadow: 0 0 3px rgba(0,0,0,0.8);
+}
 .overlay {
   position: fixed;
   top: 0;
@@ -22,7 +34,7 @@
 .content {
   position: relative;
   z-index: 1;
-  max-width: 1400px;
+  max-width: 1500px;
   margin: 0 auto;
 }
 
@@ -122,6 +134,9 @@
 }
 
 /* Tarjetas de contenido */
+
+
+
 .glass-card {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
@@ -179,7 +194,7 @@
 .second-row, .third-row {
   display: flex;
   gap: 20px;
-  width: 100%;
+  width: 1530px;
 }
 
 .second-row > .glass-card, 
@@ -189,7 +204,7 @@
 
 /* Efecto LED mejorado */
 .active-border {
-  box-shadow: 0 0 0 2px #00fffc, 0 0 15px rgba(0, 255, 252, 0.4);
+  box-shadow: 0 0 0 2px #00fffc, 0 0 15px rgba(0, 255, 252, 0.0);
   animation: led-pulse 2s infinite ease-in-out;
   position: relative;
   z-index: 1;
@@ -203,19 +218,19 @@
   right: 0;
   bottom: 0;
   border-radius: 7px;
-  background: linear-gradient(135deg, rgba(0, 255, 252, 0.1) 0%, transparent 100%);
+  background: linear-gradient(135deg, rgba(0, 255, 252, 0.0) 0%, transparent 100%);
   z-index: -1;
 }
 
 @keyframes led-pulse {
   0% {
-    box-shadow: 0 0 0 2px #00fffc, 0 0 10px rgba(0, 255, 252, 0.3);
+    box-shadow: 0 0 0 2px #00fffc, 0 0 10px rgba(0, 255, 252, 0.0);
   }
   50% {
-    box-shadow: 0 0 0 4px #00fffc, 0 0 25px rgba(0, 255, 252, 0.8);
+    box-shadow: 0 0 0 4px #00fffc, 0 0 25px rgba(0, 255, 252, 0.0);
   }
   100% {
-    box-shadow: 0 0 0 2px #00fffc, 0 0 10px rgba(0, 255, 252, 0.3);
+    box-shadow: 0 0 0 2px #00fffc, 0 0 10px rgba(0, 255, 252, 0.0);
   }
 }
 
@@ -312,4 +327,5 @@ tr:hover {
     flex-direction: column;
     gap: 5px;
   }
+  
 }

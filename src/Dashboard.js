@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import ChartComponent from "./components/ChartComponent";
+import ChartComponentPFA from './components/ChartComponentPFA';
 import GaussianChart from "./components/GaussianChart";
 import "./Dashboard.css";
 
@@ -15,6 +16,33 @@ const GOOGLE_SHEET_CONFIG = {
     CPK: 'CPK RESULTS!A:Z'
   },
   POLLING_INTERVAL: 30000 // 30 segundos para verificar cambios
+};
+const thStyleLeft = {
+  textAlign: 'left',
+  padding: '8px',
+};
+
+const thStyleCenter = {
+  textAlign: 'center',
+  padding: '8px',
+};
+
+const thStyleRight = {
+  textAlign: 'right',
+  padding: '8px',
+};
+
+const footerStyle = {
+  fontWeight: 'bold',
+  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  padding: '10px',
+};
+
+const emptyStateStyle = {
+  textAlign: 'center',
+  color: '#ccc',
+  fontStyle: 'italic',
+  padding: '20px',
 };
 
 const Dashboard = () => {
@@ -63,6 +91,7 @@ const Dashboard = () => {
   useEffect(() => {
     const containers = ['injection', 'pfa', 'issues', 'cpk', 'gauss'];
     let currentIndex = 0;
+    
 
     const interval = setInterval(() => {
       setActiveBorder(containers[currentIndex]);
@@ -79,58 +108,38 @@ const Dashboard = () => {
   // Animación para TOP ISSUES
   useEffect(() => {
     if (topIssues.length === 0) return;
-
-    const cycleDuration = 3000;
+  
+    const cycleDuration = 5000;
     let currentIndex = 0;
-
+  
     const interval = setInterval(() => {
-      if (animationPhase === 'showing-one') {
-        setVisibleIssues([topIssues[currentIndex]]);
-        currentIndex = (currentIndex + 1) % topIssues.length;
-        
-        if (currentIndex === 0) {
-          setTimeout(() => {
-            setAnimationPhase('showing-all');
-          }, cycleDuration);
-        }
-      } else {
-        setVisibleIssues(topIssues);
-        setTimeout(() => {
-          setAnimationPhase('showing-one');
-        }, cycleDuration);
-      }
-    }, animationPhase === 'showing-one' ? cycleDuration : cycleDuration * topIssues.length);
-
+      const nextGroup = topIssues.slice(currentIndex, currentIndex + 5);
+      setVisibleIssues(nextGroup.length ? nextGroup : topIssues.slice(0, 5));
+      setAnimationPhase('showing-group');
+  
+      currentIndex = (currentIndex + 3) % topIssues.length;
+    }, cycleDuration);
+  
     return () => clearInterval(interval);
-  }, [topIssues, animationPhase]);
+  }, [topIssues]);
 
-  // Animación para CPK
   useEffect(() => {
     if (cpkData.length === 0) return;
-
-    const cycleDuration = 3000;
+  
+    const cycleDuration = 5000;
     let currentIndex = 0;
-
+  
     const interval = setInterval(() => {
-      if (cpkAnimationPhase === 'showing-one') {
-        setVisibleCpkItems([cpkData[currentIndex]]);
-        currentIndex = (currentIndex + 1) % cpkData.length;
-        
-        if (currentIndex === 0) {
-          setTimeout(() => {
-            setCpkAnimationPhase('showing-all');
-          }, cycleDuration);
-        }
-      } else {
-        setVisibleCpkItems(cpkData);
-        setTimeout(() => {
-          setCpkAnimationPhase('showing-one');
-        }, cycleDuration);
-      }
-    }, cpkAnimationPhase === 'showing-one' ? cycleDuration : cycleDuration * cpkData.length);
-
+      const nextGroup = cpkData.slice(currentIndex, currentIndex + 5);
+      setVisibleCpkItems(nextGroup.length ? nextGroup : cpkData.slice(0, 5));
+      setCpkAnimationPhase('showing-group');
+  
+      currentIndex = (currentIndex + 3) % cpkData.length;
+    }, cycleDuration);
+  
     return () => clearInterval(interval);
-  }, [cpkData, cpkAnimationPhase]);
+  }, [cpkData]);
+    
 
   // Funciones de cálculo
   const calculatePercentiles = (data, mean, stdDev) => {
@@ -178,80 +187,65 @@ const Dashboard = () => {
     }
   };
 
-  const processGaussData = (gaussValues) => {
-  if (!gaussValues || gaussValues.length < 4) {
-    console.error("La hoja GAUSS BELL debe tener al menos 4 filas (UCL, AVERAGE, X, LCL)");
-    return null;
-  }
-
-  try {
-    // Extracción directa por posición fija de filas
-    const uclLine = gaussValues[0].slice(1).map(Number); // Fila 0: UCL LINE (ignorando primera columna)
-    const averages = gaussValues[1].slice(1).map(Number); // Fila 1: AVERAGE
-    const xValues = gaussValues[2].slice(1).map(Number);  // Fila 2: X (datos reales)
-    const lclLine = gaussValues[3].slice(1).map(Number);  // Fila 3: LCL LINE
-
-    // Filtramos valores no numéricos
-    const validXValues = xValues.filter(val => !isNaN(val));
-    if (validXValues.length === 0) throw new Error("No hay valores numéricos en la fila X");
-
-    // Usamos el primer valor de UCL/LCL como límites (asumiendo son constantes)
-    const upperLimit = uclLine[0] || 899.90;
-    const lowerLimit = lclLine[0] || 900.50;
-
-    // Calculamos media (usando AVERAGE si existe, si no desde X)
-    const mean = averages[0] || validXValues.reduce((sum, val) => sum + val, 0) / validXValues.length;
-    
-    // Calculamos desviación estándar
-    const variance = validXValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / validXValues.length;
-    const stdDev = Math.sqrt(variance);
-
-    // Generación de la curva de campana (200 puntos)
-    const minX = Math.min(mean - 4 * stdDev, ...validXValues, lowerLimit);
-    const maxX = Math.max(mean + 4 * stdDev, ...validXValues, upperLimit);
-    const curve = [];
-    
-    for (let i = 0; i <= 200; i++) {
-      const x = minX + (i * (maxX - minX)) / 200;
-      curve.push({
-        x: parseFloat(x.toFixed(4)),
-        y: parseFloat(gaussian(x, mean, stdDev).toFixed(8))
-      });
-    }
-
-    // Datos para puntos individuales
-    const rawData = validXValues.map((val, i) => ({
-      x: i + 1, // Índice del punto
-      y: val,
-      outOfSpec: val < lowerLimit || val > upperLimit,
-      ucl: upperLimit,
-      lcl: lowerLimit
-    }));
-
-    return {
-      curve,
-      rawData,
-      stats: {
-        mean,
-        stdDev,
-        cpk: calculateCpk(validXValues, upperLimit, lowerLimit, mean, stdDev),
-        upperLimit,
-        lowerLimit,
-        outOfSpec: validXValues.filter(v => v < lowerLimit || v > upperLimit).length,
-        totalPoints: validXValues.length
-      },
-      percentiles: calculatePercentiles(validXValues, mean, stdDev)
-    };
-
-  } catch (error) {
-    console.error("Error procesando GAUSS BELL:", error);
-    return null;
-  }
+// Función de densidad de probabilidad normal (Gaussiana)
+const gaussian = (x, mean, stdDev) => {
+  const exponent = -0.5 * Math.pow((x - mean) / stdDev, 2);
+  return (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
 };
-  // Función de densidad de probabilidad normal
-  const gaussian = (x, mean, stdDev) => {
-    const exponent = -0.5 * Math.pow((x - mean) / stdDev, 2);
-    return (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
+
+  const processGaussData = (gaussValues) => {
+    try {
+      // Valores fijos según tus requerimientos
+      const target = 900.20;
+      const upperLimit = 900.50;
+      const lowerLimit = 899.90;
+  
+      // Extrae solo los valores reales (fila X) ignorando encabezados
+      const rawValues = gaussValues.length >= 3 
+        ? gaussValues[2].slice(1).map(Number).filter(val => !isNaN(val))
+        : [];
+  
+      // Si no hay datos, usa valores de ejemplo
+      const validValues = rawValues.length > 0 ? rawValues : [target];
+      const mean = validValues.reduce((sum, val) => sum + val, 0) / validValues.length;
+      const stdDev = Math.sqrt(
+        validValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / validValues.length
+      );
+  
+      // Genera la curva de campana (rango ±4σ desde la media)
+      const curve = [];
+      const minX = Math.min(mean - 4 * stdDev, lowerLimit);
+      const maxX = Math.max(mean + 4 * stdDev, upperLimit);
+  
+      for (let i = 0; i <= 200; i++) {
+        const x = minX + (i * (maxX - minX)) / 200;
+        curve.push({
+          x: parseFloat(x.toFixed(4)),
+          y: parseFloat(gaussian(x, mean, stdDev).toFixed(8))
+        });
+      }
+  
+      return {
+        curve,
+        rawData: validValues.map((val, i) => ({
+          x: i + 1,
+          y: val,
+          outOfSpec: val < lowerLimit || val > upperLimit
+        })),
+        stats: {
+          mean,
+          stdDev,
+          cpk: calculateCpk(validValues, upperLimit, lowerLimit, mean, stdDev),
+          upperLimit,
+          lowerLimit,
+          outOfSpec: validValues.filter(v => v < lowerLimit || v > upperLimit).length,
+          totalPoints: validValues.length
+        }
+      };
+    } catch (error) {
+      console.error("Error procesando GAUSS BELL:", error);
+      return null;
+    }
   };
 
   // Función de carga de datos actualizada
@@ -272,9 +266,13 @@ const Dashboard = () => {
           headers.forEach((header, index) => {
             obj[header] = row[index] || '';
           });
+          
+          const dgrtValue = parseFloat(obj["DGTR"]) || 0;
+          
           return {
             week: obj["WEEK"] || `Semana ${rows.indexOf(row) + 1}`,
-            dgrt: parseFloat(obj["DGTR"]) || 0,
+            dgrt: dgrtValue,
+            dgrtDisplay: `${(dgrtValue * 100).toFixed(2)}%`, // Versión en porcentaje
             date: obj["DATE"] || null,
             machine: obj["MACHINE"] || "N/A"
           };
@@ -305,7 +303,7 @@ const Dashboard = () => {
         setDataPFA(formattedPFA);
       }
 
-      // Cargar y procesar datos para Gauss Bell
+      
       // Cargar y procesar datos para Gauss Bell
       const gaussValues = await fetchGoogleSheetData(GOOGLE_SHEET_CONFIG.SHEET_NAMES.GAUSS);
       if (gaussValues && gaussValues.length >= 4) {
@@ -478,313 +476,216 @@ const Dashboard = () => {
           <div 
             ref={el => setContainerRef(0, el)}
             className={`glass-card injection-chart full-width ${activeBorder === 'injection' ? 'active-border' : ''}`}
-            style={{ height: '180px' }}
+            style={{ height: '190px' }}
           >
             <h3>DGRT INJECTION</h3>
             {dataInjection.length > 0 ? (
-              <div className="chart-container" style={{ height: '120px' }}>
-                <ChartComponent 
-                  data={dataInjection} 
-                  dataKey="dgrt" 
-                  color="rgba(255, 255, 255, 0.8)"
-                  theme="dark"
-                  key={`injection-${dataVersion}`}
-                />
-              </div>
+             <div className="chart-container" style={{ height: '120px' }}>
+             <ChartComponent 
+               data={dataInjection} 
+               dataKey="dgrt"
+               stroke="rgba(255, 255, 255, 0.8)"
+               showValues={true}
+               valueFormatter={(value) => `${(value * 100).toFixed(2)}%`}
+               dot={{ r: 2, fill: '#4fc3f7' }}
+             />
+           </div>
+            
             ) : (
               <p className="no-data">No hay datos de inyección disponibles</p>
             )}
           </div>
 
-          {/* Segunda fila: Izquierda DGRT PFA, derecha Top Issues */}
-          <div className="second-row">
-            {/* DGRT PFA */}
-            <div 
-              ref={el => setContainerRef(1, el)}
-              className={`glass-card pfa-chart ${activeBorder === 'pfa' ? 'active-border' : ''}`}
-              style={{ height: '180px' }}
-            >
-              <h3>DGRT PFA</h3>
-              {dataPFA.length > 0 ? (
-                <div className="chart-container" style={{ height: '120px' }}>
-                  <ChartComponent 
-                    data={dataPFA} 
-                    multiLineKeys={["dayShift", "nightShift", "tgt"]} 
-                    colors={[
-                      "rgba(100, 255, 150, 0.8)", 
-                      "rgba(255, 200, 100, 0.8)", 
-                      "rgba(100, 150, 255, 0.8)"
-                    ]}
-                    theme="dark"
-                    key={`pfa-${dataVersion}`}
-                  />
-                </div>
-              ) : (
-                <p className="no-data">No hay datos PFA disponibles</p>
-              )}
-            </div>
+         {/* Segunda fila: Izquierda y derecha DGRT PFA */}
+<div className="second-row">
+  {/* DGRT PFA - izquierda */}
+  <div 
+    ref={el => setContainerRef(1, el)}
+    className={`glass-card pfa-chart ${activeBorder === 'pfa' ? 'active-border' : ''}`}
+    style={{ height: '190px', width: '50%' }}
+  >
+    <h3>DGRT PFA DAY</h3>
+    {dataPFA.length > 0 ? (
+      <div style={{ width: '100%', height: '180px' }}>
+        <ChartComponentPFA 
+          data={dataPFA}
+          multiLineKeys={["dayShift", "tgt"]}
+          colors={["#07a9ff", "#ff0707"]}
+        />
+      </div>
+    ) : (
+      <p className="no-data">No hay datos PFA disponibles</p>
+    )}
+  </div>
 
-            {/* TOP ISSUES */}
-            <div 
-              ref={el => setContainerRef(2, el)}
-              className={`glass-card issues-card ${activeBorder === 'issues' ? 'active-border' : ''}`}
-              style={{ height: '180px' }}
-            >
-              <h3>TOP ISSUES</h3>
-              {topIssues.length > 0 ? (
-                <div style={{ 
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: 'calc(100% - 40px)',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    flex: 1,
-                    overflowY: 'auto',
-                    marginRight: '-8px',
-                    paddingRight: '8px'
-                  }}>
-                    <table style={{
-                      width: '100%',
-                      borderCollapse: 'collapse',
-                      fontSize: '0.8rem'
-                    }}>
-                      <thead>
-                        <tr>
-                          <th style={{
-                            padding: '8px',
-                            textAlign: 'left',
-                            background: 'rgba(0, 100, 200, 0.25)',
-                            position: 'sticky',
-                            top: 0
-                          }}>DEFECT</th>
-                          <th style={{
-                            padding: '8px',
-                            textAlign: 'right',
-                            background: 'rgba(0, 100, 200, 0.25)',
-                            position: 'sticky',
-                            top: 0
-                          }}>QTY</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {visibleIssues.map((issue, index) => (
-                          <tr 
-                            key={`${issue.defect}-${index}-${dataVersion}`}
-                            style={{
-                              animation: `${animationPhase === 'showing-one' ? 'fadeIn 0.5s ease-in-out' : 'none'}`,
-                              borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
-                            }}
-                          >
-                            <td style={{
-                              padding: '6px',
-                              maxWidth: '120px',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis'
-                            }}>{issue.defect}</td>
-                            <td style={{
-                              padding: '6px',
-                              textAlign: 'right'
-                            }}>{issue.qty}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div style={{
-                    marginTop: '8px',
-                    padding: '6px',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: '4px',
-                    textAlign: 'right',
-                    fontSize: '0.8rem'
-                  }}>
-                    <p>Total: {topIssues.reduce((sum, issue) => sum + issue.qty, 0)}</p>
-                  </div>
-                </div>
-              ) : (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: 'calc(100% - 30px)',
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  fontStyle: 'italic'
-                }}>
-                  No se encontraron datos
-                </div>
-              )}
-            </div>
+  {/* DGRT PFA - derecha (repetido) */}
+  <div 
+    ref={el => setContainerRef(2, el)}
+    className={`glass-card pfa-chart ${activeBorder === 'pfa' ? 'active-border' : ''}`}
+    style={{ height: '190px', width: '50%' }}
+  >
+    <h3>DGRT PFA NIGTH</h3>
+    {dataPFA.length > 0 ? (
+      <div style={{ width: '100%', height: '180px' }}>
+        <ChartComponentPFA 
+          data={dataPFA}
+          multiLineKeys={["nightShift", "tgt"]}
+          colors={["#37d500", "#ff0707"]}
+        />
+      </div>
+    ) : (
+      <p className="no-data">No hay datos PFA disponibles</p>
+    )}
+  </div>
+</div>
+
+  {/* Tercera fila: Izquierda CPK, derecha Top Issues */}
+  <div className="third-row" style={{ display: 'flex', gap: '16px' }}>
+  {/* CPK y Top Issues lado a lado */}
+  <div style={{ display: 'flex', flex: 1, gap: '16px', height: '290px' }}>
+    
+    {/* CPK */}
+    <div 
+      ref={el => setContainerRef(3, el)}
+      className={`glass-card cpk-card ${activeBorder === 'cpk' ? 'active-border' : ''}`}
+      style={{ flex: 1 }}
+    >
+      <h3>CPK POR MÁQUINA</h3>
+      {cpkData.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100% - 40px)' }}>
+          <div style={{ flex: 1, overflowY: 'auto', marginRight: '-8px', paddingRight: '8px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.5rem' }}>
+              <thead>
+                <tr>
+                  <th style={thStyleLeft}>MÁQUINA</th>
+                  <th style={thStyleCenter}>CPK</th>
+                  <th style={thStyleRight}>FECHA</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleCpkItems.map((item, index) => (
+                  <tr 
+                    key={`${item.machine}-${index}-${dataVersion}`}
+                    style={{
+                      animation: cpkAnimationPhase === 'showing-one' ? 'fadeIn 0.5s ease-in-out' : 'none',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+                    }}
+                  >
+                    <td style={{ padding: '6px' }}>{item.machine}</td>
+                    <td style={{ padding: '6px', textAlign: 'center', color: getCpkColor(item.cpk), fontWeight: 'bold' }}>
+                      {item.cpk.toFixed(2)}
+                    </td>
+                    <td style={{ padding: '6px', textAlign: 'right', fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                      {item.date}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={footerStyle}>
+            <p>CPK Promedio: {(cpkData.reduce((sum, item) => sum + item.cpk, 0) / cpkData.length).toFixed(2)}</p>
+          </div>
+        </div>
+      ) : (
+        <div style={emptyStateStyle}>No se encontraron datos</div>
+      )}
+    </div>
+
+    {/* Top Issues */}
+    <div 
+      ref={el => setContainerRef(4, el)}
+      className={`glass-card issues-card ${activeBorder === 'issues' ? 'active-border' : ''}`}
+      style={{ flex: 1 }}
+    >
+      <h3>TOP ISSUES</h3>
+      {topIssues.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100% - 40px)' }}>
+          <div style={{ flex: 1, overflowY: 'auto', marginRight: '-8px', paddingRight: '8px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.6rem' }}>
+              <thead>
+                <tr>
+                  <th style={thStyleLeft}>DEFECT</th>
+                  <th style={thStyleRight}>QTY</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleIssues.map((issue, index) => (
+                  <tr 
+                    key={`${issue.defect}-${index}-${dataVersion}`}
+                    style={{
+                      animation: animationPhase === 'showing-group' ? 'fadeIn 0.5s ease-in-out' : 'none',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+                    }}
+                    
+                  >
+                    <td style={{
+                      padding: '6px',
+                      maxWidth: '120px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>{issue.defect}</td>
+                    <td style={{ padding: '6px', textAlign: 'right' }}>{issue.qty}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={footerStyle}>
+            <p>Total: {topIssues.reduce((sum, issue) => sum + issue.qty, 0)}</p>
+          </div>
+        </div>
+      ) : (
+        <div style={emptyStateStyle}>No se encontraron datos</div>
+      )}
+    </div>
+  </div>
+
+  {/* Gauss Bell a la derecha */}
+  {gaussData.curve.length > 0 && (() => {
+    const mean = 900.04;
+    const upperLimit = 900.50;
+    const lowerLimit = 899.90;
+    const cpk = 0.45;
+    const outOfSpecCount = gaussData.curve.filter(d => d.x < lowerLimit || d.x > upperLimit).length;
+
+    return (
+      <div className="glass-card gauss-chart" style={{ width: '50%', height: '270px', padding: '10px' }}>
+        <h3 style={{ marginBottom: '15px', fontSize: '16px' }}>GRÁFICA GAUSS BELL</h3>
+        <div style={{ display: 'flex', height: 'calc(100% - 40px)', gap: '10px' }}>
+          {/* Chart */}
+          <div style={{ flex: 1, position: 'relative', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}>
+            <GaussianChart 
+              curveData={gaussData.curve}
+              stats={{ mean, upperLimit, lowerLimit, cpk }}
+              isSmall={true}
+              key={`gauss-${dataVersion}`}
+            />
           </div>
 
-          {/* Tercera fila: Izquierda CPK, derecha Gauss Bell */}
-          <div className="third-row">
-            {/* CPK por Máquina */}
-            <div 
-              ref={el => setContainerRef(3, el)}
-              className={`glass-card cpk-card ${activeBorder === 'cpk' ? 'active-border' : ''}`}
-              style={{ height: '220px' }}
-            >
-              <h3>CPK POR MÁQUINA</h3>
-              {cpkData.length > 0 ? (
-                <div style={{ 
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: 'calc(100% - 40px)'
-                }}>
-                  <div style={{
-                    flex: 1,
-                    overflowY: 'auto',
-                    marginRight: '-8px',
-                    paddingRight: '8px'
-                  }}>
-                    <table style={{
-                      width: '100%',
-                      borderCollapse: 'collapse',
-                      fontSize: '0.8rem'
-                    }}>
-                      <thead>
-                        <tr>
-                          <th style={{
-                            padding: '8px',
-                            textAlign: 'left',
-                            background: 'rgba(0, 100, 200, 0.25)',
-                            position: 'sticky',
-                            top: 0
-                          }}>MÁQUINA</th>
-                          <th style={{
-                            padding: '8px',
-                            textAlign: 'center',
-                            background: 'rgba(0, 100, 200, 0.25)',
-                            position: 'sticky',
-                            top: 0
-                          }}>CPK</th>
-                          <th style={{
-                            padding: '8px',
-                            textAlign: 'right',
-                            background: 'rgba(0, 100, 200, 0.25)',
-                            position: 'sticky',
-                            top: 0
-                          }}>FECHA</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {visibleCpkItems.map((item, index) => (
-                          <tr 
-                            key={`${item.machine}-${index}-${dataVersion}`}
-                            style={{
-                              animation: `${cpkAnimationPhase === 'showing-one' ? 'fadeIn 0.5s ease-in-out' : 'none'}`,
-                              borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
-                            }}
-                          >
-                            <td style={{ padding: '6px' }}>{item.machine}</td>
-                            <td style={{ 
-                              padding: '6px',
-                              textAlign: 'center',
-                              color: getCpkColor(item.cpk),
-                              fontWeight: cpkAnimationPhase === 'showing-one' ? 'bold' : 'normal'
-                            }}>
-                              {item.cpk.toFixed(2)}
-                            </td>
-                            <td style={{ 
-                              padding: '6px',
-                              textAlign: 'right',
-                              fontFamily: 'monospace',
-                              fontSize: '0.7rem'
-                            }}>
-                              {item.date}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div style={{
-                    marginTop: '8px',
-                    padding: '6px',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: '4px',
-                    textAlign: 'right',
-                    fontSize: '0.8rem'
-                  }}>
-                    <p>CPK Promedio: {(cpkData.reduce((sum, item) => sum + item.cpk, 0) / cpkData.length).toFixed(2)}</p>
-                  </div>
-                </div>
-              ) : (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: 'calc(100% - 30px)',
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  fontStyle: 'italic'
-                }}>
-                  No se encontraron datos
-                </div>
-              )}
+          {/* Stats Panel */}
+          <div style={{ width: '130px', padding: '8px', background: 'rgba(30, 30, 30, 0.7)', borderRadius: '6px', fontSize: '12px' }}>
+            <div style={{ marginBottom: '12px' }}>
+              <p><strong>Media:</strong> {mean.toFixed(2)}</p>
+              <p><strong>Lím. Superior:</strong> {upperLimit.toFixed(2)}</p>
+              <p><strong>Lím. Inferior:</strong> {lowerLimit.toFixed(2)}</p>
             </div>
-
-           {/* Gauss Bell - Renderizado mejorado */}
-      <div 
-        ref={el => setContainerRef(4, el)}
-        className={`glass-card gauss-chart ${activeBorder === 'gauss' ? 'active-border' : ''}`}
-        style={{ height: '220px' }}
-      >
-        <h3>GAUSS BELL - M#6 (T332449)</h3>
-        {gaussData.curve.length > 0 ? (
-          <div style={{ display: 'flex', height: 'calc(100% - 30px)' }}>
-            <div style={{ flex: 1, height: '100%', transform: 'scale(0.8)', transformOrigin: 'top left' }}>
-              <GaussianChart 
-                curveData={gaussData.curve}
-                rawData={gaussData.rawData}
-                stats={gaussData.stats}
-                percentiles={gaussData.percentiles}
-                isSmall={true}
-                key={`gauss-${dataVersion}`}
-              />
-            </div>
-            <div style={{
-              width: '120px',
-              fontSize: '0.75rem',
-              paddingLeft: '10px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-evenly'
-            }}>
-              <div>
-                <p><strong>Límite Superior:</strong> {gaussData.stats.upperLimit.toFixed(2)}</p>
-                <p><strong>Límite Inferior:</strong> {gaussData.stats.lowerLimit.toFixed(2)}</p>
-              </div>
-              <div>
-                <p><strong>Media (μ):</strong> {gaussData.stats.mean.toFixed(2)}</p>
-                <p><strong>Desv. Est. (σ):</strong> {gaussData.stats.stdDev.toFixed(2)}</p>
-              </div>
-              <div>
-                <p><strong>CPK:</strong> <span style={{ color: getCpkColor(gaussData.stats.cpk) }}>
-                  {gaussData.stats.cpk.toFixed(2)}
-                </span></p>
-                <p><strong>Fuera de Spec:</strong> {gaussData.stats.outOfSpec}/{gaussData.stats.totalPoints}</p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 'calc(100% - 30px)',
-            color: 'rgba(255, 255, 255, 0.5)',
-            fontStyle: 'italic'
-          }}>
-            {loading ? 'Cargando datos de Gauss Bell...' : 'Datos no disponibles'}
-          </div>
-        )}
+            <div>
+              <p><strong>Target:</strong> 900.20</p>
+              <p><strong>CPK:</strong> {cpk.toFixed(2)}</p>
+              <p><strong>Fuera de Spec:</strong> {outOfSpecCount}</p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    );
+  })()}
+</div>
+            </div>
+          </div>
+        </div>
+      
   );
 };
 
