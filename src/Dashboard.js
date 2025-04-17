@@ -472,13 +472,13 @@ const gaussian = (x, mean, stdDev) => {
         )}
 
         <div className="charts-grid">
-          {/* Fila superior: DGRT Injection */}
+          {/* Fila superior: DGTR Injection */}
           <div 
             ref={el => setContainerRef(0, el)}
             className={`glass-card injection-chart full-width ${activeBorder === 'injection' ? 'active-border' : ''}`}
             style={{ height: '190px' }}
           >
-            <h3>DGRT INJECTION</h3>
+            <h3>DGTR INJECTION</h3>
             {dataInjection.length > 0 ? (
              <div className="chart-container" style={{ height: '120px' }}>
              <ChartComponent 
@@ -496,15 +496,15 @@ const gaussian = (x, mean, stdDev) => {
             )}
           </div>
 
-         {/* Segunda fila: Izquierda y derecha DGRT PFA */}
+         {/* Segunda fila: Izquierda y derecha DGTR PFA */}
 <div className="second-row">
-  {/* DGRT PFA - izquierda */}
+  {/* DGTR PFA - izquierda */}
   <div 
     ref={el => setContainerRef(1, el)}
     className={`glass-card pfa-chart ${activeBorder === 'pfa' ? 'active-border' : ''}`}
     style={{ height: '190px', width: '50%' }}
   >
-    <h3>DGRT PFA DAY</h3>
+    <h3>DGTR PFA DAY</h3>
     {dataPFA.length > 0 ? (
       <div style={{ width: '100%', height: '180px' }}>
         <ChartComponentPFA 
@@ -518,13 +518,13 @@ const gaussian = (x, mean, stdDev) => {
     )}
   </div>
 
-  {/* DGRT PFA - derecha (repetido) */}
+  {/* DGTR PFA - derecha (repetido) */}
   <div 
     ref={el => setContainerRef(2, el)}
     className={`glass-card pfa-chart ${activeBorder === 'pfa' ? 'active-border' : ''}`}
     style={{ height: '190px', width: '50%' }}
   >
-    <h3>DGRT PFA NIGTH</h3>
+    <h3>DGTR PFA NIGTH</h3>
     {dataPFA.length > 0 ? (
       <div style={{ width: '100%', height: '180px' }}>
         <ChartComponentPFA 
