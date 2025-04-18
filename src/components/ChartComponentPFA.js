@@ -4,16 +4,6 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Ca
 const ChartComponentPFA = ({ data, multiLineKeys = [], colors = [] }) => {
   const formatPercentage = (value) => `${(value).toFixed(2)}%`;
 
-  // Configuración responsive mejorada
-  const getLabelStyle = (index) => ({
-    fontSize: 8,
-    fill: colors[index] || '#07a9ff',
-    angle: -45,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle',
-    fontWeight: 'bold'
-  });
-
   return (
     <ResponsiveContainer width="100%" height={190}>
       <LineChart 
@@ -70,61 +60,51 @@ const ChartComponentPFA = ({ data, multiLineKeys = [], colors = [] }) => {
           iconType="circle"
         />
 
-        {multiLineKeys.length > 0 ? (
-          multiLineKeys.map((key, index) => (
-            
-            <Line
-              key={key}
-              type="monotone"
-              dataKey={key}
-              stroke={colors[index]}
-              strokeWidth={1.5}
-              dot={{ r: 3 }}
-              name={key === 'dayShift' ? 'Turno Día' : 
-                    key === 'nightShift' ? 'Turno Noche' : 
-                    key === 'tgt' ? 'Meta' : key}
-              strokeDasharray={key === 'tgt' ? '4 4' : undefined} // Línea punteada para la meta
-            >
-              {key !== 'tgt' && (
-                <LabelList
-                  dataKey={key}
-                  content={({ x, y, value }) => (
-                    <text 
-                      x={x} 
-                      y={y - 12} 
-                      dy={-5}
-                      fill={colors[index]}
-                      fontSize={7}
-                      textAnchor="middle"
-                      angle={-45}
-                    >
-                      {formatPercentage(value)}
-                    </text>
-                  )}
-                />
-              )}
-            </Line>
-          ))
-        ) : (
+        {/* Línea de tgt al fondo */}
+        {multiLineKeys.includes('tgt') && (
           <Line
+            key="tgt"
             type="monotone"
-            dataKey="dayShift"
-            stroke={colors[0] || '#07a9ff'}
-            strokeWidth={3}
-            dot={{ r: 2 }}
-          >
-            <LabelList
-              dataKey="dayShift"
-              position="top"
-              formatter={formatPercentage}
-              fill={colors[0] || '#07a9ff'}
-              fontSize={8}
-              offset={8}
-            />
-          </Line>
+            dataKey="tgt"
+            stroke="#ff0707"
+            strokeWidth={1.5}
+            strokeDasharray="4 4"
+            dot={false}
+            name="Meta"
+          />
         )}
 
-        {/* Mostrar meta flotante solo si "tgt" está presente */}
+        {/* Líneas encima de tgt, con etiquetas visibles */}
+        {multiLineKeys.filter(key => key !== 'tgt').map((key, index) => (
+          <Line
+            key={key}
+            type="monotone"
+            dataKey={key}
+            stroke={colors[index]}
+            strokeWidth={1.5}
+            dot={{ r: 3 }}
+            name={key === 'dayShift' ? 'Turno Día' : 
+                  key === 'nightShift' ? 'Turno Noche' : key}
+          >
+            <LabelList
+              dataKey={key}
+              content={({ x, y, value }) => (
+                <text 
+                  x={x} 
+                  y={y - 8} // Asegura que esté sobre la línea
+                  dy={-5}
+                  fill={colors[index]}
+                  fontSize={7}
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  {formatPercentage(value)}
+                </text>
+              )}
+            />
+          </Line>
+        ))}
+
         {multiLineKeys.includes('tgt') && data.length > 0 && data[0].tgt !== undefined && (
           <text 
             x={600} 
