@@ -72,6 +72,7 @@ const ChartComponentPFA = ({ data, multiLineKeys = [], colors = [] }) => {
 
         {multiLineKeys.length > 0 ? (
           multiLineKeys.map((key, index) => (
+            
             <Line
               key={key}
               type="monotone"
