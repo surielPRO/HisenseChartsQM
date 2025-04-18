@@ -268,10 +268,12 @@ const gaussian = (x, mean, stdDev) => {
           });
           
           const dgrtValue = parseFloat(obj["DGTR"]) || 0;
-          
+          const tgtValue = parseFloat(obj["TGT"]) || 0; 
+
           return {
             week: obj["WEEK"] || `Semana ${rows.indexOf(row) + 1}`,
             dgrt: dgrtValue,
+            TGT: tgtValue,
             dgrtDisplay: `${(dgrtValue * 100).toFixed(2)}%`, // Versión en porcentaje
             date: obj["DATE"] || null,
             machine: obj["MACHINE"] || "N/A"
@@ -481,16 +483,20 @@ const gaussian = (x, mean, stdDev) => {
             <h3>DGTR INJECTION</h3>
             {dataInjection.length > 0 ? (
              <div className="chart-container" style={{ height: '120px' }}>
-             <ChartComponent 
-               data={dataInjection} 
-               
-               multiLineKeys={["dgrt"]}
-               colors={['#4fc3f7']}
-               stroke="rgba(255, 255, 255, 0.8)"
-               showValues={true}
-               valueFormatter={(value) => `${(value * 100).toFixed(2)}%`}
-               dot={{ r: 2, fill: '#4fc3f7' }}
-             />
+            <ChartComponent 
+              data={dataInjection} 
+              multiLineKeys={["TGT", "dgrt"]} // Aquí agregas TGT
+              colors={['red','#4fc3f7']}
+              stroke="rgba(255, 255, 255, 0.8)"
+              showValues={true}
+              valueFormatter={(value) => `${(value * 100).toFixed(2)}%`}
+              dot={{ r: 2, fill: '#4fc3f7' }}
+              yAxisProps={{
+                domain: [0.75, 1],
+                tickCount: 6,
+                ticks: [0.75, 0.8, 0.85, 0.9, 0.95, 1],
+              }}
+            />
            </div>
             
             ) : (
