@@ -452,9 +452,9 @@ const gaussian = (x, mean, stdDev) => {
         {/* Indicador de última actualización */}
         {lastUpdated && (
           <div className="last-updated">
-            Última actualización: {lastUpdated.toLocaleTimeString()}
+            Last update: {lastUpdated.toLocaleTimeString()}
             <button onClick={loadAllData} className="refresh-button">
-              Actualizar ahora
+            Update
             </button>
           </div>
         )}
@@ -505,52 +505,10 @@ const gaussian = (x, mean, stdDev) => {
           </div>
 
          {/* Segunda fila: Izquierda y derecha DGTR PFA */}
-<div className="second-row">
-  {/* DGTR PFA - izquierda */}
-  <div 
-    ref={el => setContainerRef(1, el)}
-    className={`glass-card pfa-chart ${activeBorder === 'pfa' ? 'active-border' : ''}`}
-    style={{ height: '190px', width: '50%' }}
-  >
-    <h3>DGTR PFA DAY</h3>
-    {dataPFA.length > 0 ? (
-      <div style={{ width: '100%', height: '180px' }}>
-        <ChartComponentPFA 
-          data={dataPFA}
-          multiLineKeys={["dayShift", "tgt"]}
-          colors={["#07a9ff", "#ff0707"]}
-        />
-      </div>
-    ) : (
-      <p className="no-data">No hay datos PFA disponibles</p>
-    )}
-  </div>
-
-  {/* DGTR PFA - derecha (repetido) */}
-  <div 
-    ref={el => setContainerRef(2, el)}
-    className={`glass-card pfa-chart ${activeBorder === 'pfa' ? 'active-border' : ''}`}
-    style={{ height: '190px', width: '50%' }}
-  >
-    <h3>DGTR PFA NIGTH</h3>
-    {dataPFA.length > 0 ? (
-      <div style={{ width: '100%', height: '180px' }}>
-        <ChartComponentPFA 
-          data={dataPFA}
-          multiLineKeys={["nightShift", "tgt"]}
-          colors={["#37d500", "#ff0707"]}
-        />
-      </div>
-    ) : (
-      <p className="no-data">No hay datos PFA disponibles</p>
-    )}
-  </div>
-</div>
-
-  {/* Tercera fila: Izquierda CPK, derecha Top Issues */}
-  <div className="third-row" style={{ display: 'flex', gap: '16px' }}>
-  {/* CPK y Top Issues lado a lado */}
-  <div style={{ display: 'flex', flex: 1, gap: '16px', height: '290px' }}>
+         <div className="second-row" style={{ display: 'flex', gap: '16px' }}>
+    
+   {/* CPK y Top Issues lado a lado */}
+   <div style={{ display: 'flex', flex: 1, gap: '16px', height: '290px' }}>
     
     {/* CPK */}
     <div 
@@ -558,16 +516,16 @@ const gaussian = (x, mean, stdDev) => {
       className={`glass-card cpk-card ${activeBorder === 'cpk' ? 'active-border' : ''}`}
       style={{ flex: 1 }}
     >
-      <h3>CPK POR MÁQUINA</h3>
+      <h3>CPK FOR MACHINE</h3>
       {cpkData.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100% - 40px)' }}>
           <div style={{ flex: 1, overflowY: 'auto', marginRight: '-8px', paddingRight: '8px' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.5rem' }}>
               <thead>
                 <tr>
-                  <th style={thStyleLeft}>MÁQUINA</th>
+                  <th style={thStyleLeft}>MACHINE</th>
                   <th style={thStyleCenter}>CPK</th>
-                  <th style={thStyleRight}>FECHA</th>
+                  <th style={thStyleRight}>DATE</th>
                 </tr>
               </thead>
               <tbody>
@@ -592,7 +550,7 @@ const gaussian = (x, mean, stdDev) => {
             </table>
           </div>
           <div style={footerStyle}>
-            <p>CPK Promedio: {(cpkData.reduce((sum, item) => sum + item.cpk, 0) / cpkData.length).toFixed(2)}</p>
+            <p>CPK Average: {(cpkData.reduce((sum, item) => sum + item.cpk, 0) / cpkData.length).toFixed(2)}</p>
           </div>
         </div>
       ) : (
@@ -660,7 +618,7 @@ const gaussian = (x, mean, stdDev) => {
 
     return (
       <div className="glass-card gauss-chart" style={{ width: '50%', height: '270px', padding: '10px' }}>
-        <h3 style={{ marginBottom: '15px', fontSize: '16px' }}>GRÁFICA GAUSS BELL</h3>
+        <h3 style={{ marginBottom: '15px', fontSize: '18px', fontWeight: 'bold'  }}>GRAPH GAUSS BELL</h3>
         <div style={{ display: 'flex', height: 'calc(100% - 40px)', gap: '10px' }}>
           {/* Chart */}
           <div style={{ flex: 1, position: 'relative', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}>
@@ -673,11 +631,11 @@ const gaussian = (x, mean, stdDev) => {
           </div>
 
           {/* Stats Panel */}
-          <div style={{ width: '130px', padding: '8px', background: 'rgba(30, 30, 30, 0.7)', borderRadius: '6px', fontSize: '12px' }}>
+          <div style={{ width: '130px', padding: '8px', background: 'rgba(30, 30, 30, 0.7)', borderRadius: '6px', fontSize: '12px',fontWeight: 'bold' }}>
             <div style={{ marginBottom: '12px' }}>
-              <p><strong>Media:</strong> {mean.toFixed(2)}</p>
-              <p><strong>Lím. Superior:</strong> {upperLimit.toFixed(2)}</p>
-              <p><strong>Lím. Inferior:</strong> {lowerLimit.toFixed(2)}</p>
+              <p><strong>Average:</strong> {mean.toFixed(2)}</p>
+              <p><strong>Superior Limit :</strong> {upperLimit.toFixed(2)}</p>
+              <p><strong>Lower Limit :</strong> {lowerLimit.toFixed(2)}</p>
             </div>
             <div>
               <p><strong>Target:</strong> 900.20</p>
@@ -691,10 +649,54 @@ const gaussian = (x, mean, stdDev) => {
     );
   })()}
 </div>
+
+  {/* Tercera fila: Izquierda CPK, derecha Top Issues */}
+  <div className="third-row">
+ 
+  {/* DGTR PFA - izquierda */}
+  <div 
+    ref={el => setContainerRef(1, el)}
+    className={`glass-card pfa-chart ${activeBorder === 'pfa' ? 'active-border' : ''}`}
+    style={{ height: '190px', width: '50%' }}
+  >
+    <h3>DGTR PFA DAY</h3>
+    {dataPFA.length > 0 ? (
+      <div style={{ width: '100%', height: '180px' }}>
+        <ChartComponentPFA 
+          data={dataPFA}
+          multiLineKeys={["dayShift", "tgt"]}
+          colors={["#07a9ff", "#ff0707"]}
+        />
+      </div>
+    ) : (
+      <p className="no-data">No hay datos PFA disponibles</p>
+    )}
+  </div>
+
+  {/* DGTR PFA - derecha (repetido) */}
+  <div 
+    ref={el => setContainerRef(2, el)}
+    className={`glass-card pfa-chart ${activeBorder === 'pfa' ? 'active-border' : ''}`}
+    style={{ height: '190px', width: '50%' }}
+  >
+    <h3>DGTR PFA NIGHT</h3>
+    {dataPFA.length > 0 ? (
+      <div style={{ width: '100%', height: '180px' }}>
+        <ChartComponentPFA 
+          data={dataPFA}
+          multiLineKeys={["nightShift", "tgt"]}
+          colors={["#37d500", "#ff0707"]}
+        />
+      </div>
+    ) : (
+      <p className="no-data">No hay datos PFA disponibles</p>
+    )}
+  </div>
+</div>
             </div>
           </div>
-        </div>
-      
+        
+          </div>
   );
 };
 
