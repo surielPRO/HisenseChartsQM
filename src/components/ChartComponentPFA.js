@@ -15,11 +15,11 @@ const ChartComponentPFA = ({ data, multiLineKeys = [], colors = [] }) => {
         <XAxis
           dataKey="week"
           label={{
-            value: "Semana/Week",
+            value: "Week",
             position: "insideBottom",
             offset: 0,
             style: {
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: "bold",
               fill: "#ffffff"
             }
@@ -29,7 +29,7 @@ const ChartComponentPFA = ({ data, multiLineKeys = [], colors = [] }) => {
 
         <YAxis
           label={{
-            value: "Porcentaje (%)",
+            value: "Percentage%",
             angle: -90,
             offset: -0,
             position: "insideLeft",
@@ -70,7 +70,7 @@ const ChartComponentPFA = ({ data, multiLineKeys = [], colors = [] }) => {
             strokeWidth={1.5}
             strokeDasharray="4 4"
             dot={false}
-            name="Meta"
+            name="Target"
           />
         )}
 
@@ -83,8 +83,8 @@ const ChartComponentPFA = ({ data, multiLineKeys = [], colors = [] }) => {
             stroke={colors[index]}
             strokeWidth={1.5}
             dot={{ r: 3 }}
-            name={key === 'dayShift' ? 'Turno Día' : 
-                  key === 'nightShift' ? 'Turno Noche' : key}
+            name={key === 'dayShift' ? 'Day Shift' : 
+                  key === 'nightShift' ? 'Night Shift' : key}
           >
             <LabelList
               dataKey={key}

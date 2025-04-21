@@ -53,7 +53,7 @@ const GaussianChart = ({ curveData, stats, isSmall }) => {
         
         <Tooltip
           formatter={(value, name) => [value.toFixed(4), name]}
-          labelFormatter={(label) => `Valor: ${label.toFixed(2)}`}
+          labelFormatter={(label) => `Value: ${label.toFixed(2)}`}
           contentStyle={{
             background: 'rgba(30, 30, 30, 0.95)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -78,7 +78,7 @@ const GaussianChart = ({ curveData, stats, isSmall }) => {
           strokeWidth={2}
         >
           <Label 
-            value={`Media: ${mean.toFixed(2)}`}
+            value={`Average: ${mean.toFixed(2)}`}
             position={Math.abs(mean - maxYPoint.x) < 0.01 ? 'top' : 'insideTop'}
             fill="#4CAF50"
             fontSize={chartConfig.fontSize}
@@ -93,7 +93,7 @@ const GaussianChart = ({ curveData, stats, isSmall }) => {
           strokeDasharray="5 5"
         >
           <Label 
-            value={`Lím Inf: ${lowerLimit.toFixed(2)}`}
+            value={`Lower Limit: ${lowerLimit.toFixed(2)}`}
             position="insideBottomLeft"
             fill="#F44336"
             fontSize={chartConfig.fontSize}
@@ -108,7 +108,7 @@ const GaussianChart = ({ curveData, stats, isSmall }) => {
           strokeDasharray="5 5"
         >
           <Label 
-            value={`Lím Sup: ${upperLimit.toFixed(2)}`}
+            value={`Superior Limit: ${upperLimit.toFixed(2)}`}
             position="insideTopRight"
             fill="#F44336"
             fontSize={chartConfig.fontSize}

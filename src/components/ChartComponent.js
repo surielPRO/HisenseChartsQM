@@ -28,7 +28,7 @@ const ChartComponent = ({ data, dataKey, color, multiLineKeys = [], colors = [],
         <XAxis
           dataKey="week"
           label={{
-            value: "Semana/Week",
+            value: "Week",
             position: "insideBottom",
             offset: 0,
             style: {
@@ -57,11 +57,11 @@ const ChartComponent = ({ data, dataKey, color, multiLineKeys = [], colors = [],
 <Tooltip
   formatter={(value, name) => {
     const displayName =
-      name === 'TGT' ? 'Meta' :
+      name === 'TGT' ? 'Target' :
       name === 'dgrt' ? 'DGTR' : name;
     return [formatPercentage(value), displayName];
   }}
-  labelFormatter={(label) => `Semana: ${label}`}
+  labelFormatter={(label) => `Week: ${label}`}
   contentStyle={{
     background: 'rgba(30, 30, 30, 0.95)',
     border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -86,9 +86,9 @@ const ChartComponent = ({ data, dataKey, color, multiLineKeys = [], colors = [],
               stroke={colors[index]}
               strokeWidth={1.5}
               dot={{ r: 2 }}
-              name={key === 'dayShift' ? 'Turno Día' : 
-                    key === 'nightShift' ? 'Turno Noche' : 
-                    key === 'tgt' ? 'Meta' : 
+              name={key === 'dayShift' ? 'Day Shift' : 
+                    key === 'nightShift' ? 'Night Shift' : 
+                    key === 'tgt' ? 'Target' : 
                     key === 'dgrt' ? 'DGTR' : key}
             strokeDasharray={key === 'TGT' ? '4 4' : undefined}
             >
@@ -141,7 +141,7 @@ const ChartComponent = ({ data, dataKey, color, multiLineKeys = [], colors = [],
     fontSize={10}
     fontWeight="bold"
   >
-    - - - -   |   Meta: {formatPercentage(data[0].TGT)}
+    - - - -   |   Target: {formatPercentage(data[0].TGT)}
   </text>
 )}
 
