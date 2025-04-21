@@ -617,7 +617,7 @@ const gaussian = (x, mean, stdDev) => {
     const outOfSpecCount = gaussData.curve.filter(d => d.x < lowerLimit || d.x > upperLimit).length;
 
     return (
-      <div className="glass-card gauss-chart" style={{ width: '50%', height: '270px', padding: '10px' }}>
+      <div className="glass-card gauss-chart" style={{ width: '50%', height: '290px', padding: '0px' }}>
         <h3 style={{ marginBottom: '15px', fontSize: '18px', fontWeight: 'bold'  }}>GRAPH GAUSS BELL</h3>
         <div style={{ display: 'flex', height: 'calc(100% - 40px)', gap: '10px' }}>
           {/* Chart */}
