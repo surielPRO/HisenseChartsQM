@@ -2,7 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import ChartComponent from "./components/ChartComponent";
 import ChartComponentPFA from './components/ChartComponentPFA';
 import GaussianChart from "./components/GaussianChart";
+import { Link } from "react-router-dom"; // Asegúrate de tener react-router-dom configurado
+
 import "./Dashboard.css";
+
+
 
 // Configuración - REEMPLAZA CON TUS DATOS
 const GOOGLE_SHEET_CONFIG = {
@@ -13,9 +17,10 @@ const GOOGLE_SHEET_CONFIG = {
     PFA: 'DGTR PFA!A:Z',
     GAUSS: 'GAUSS BELL!A:P',
     ISSUES: 'TOP ISSUES!A:Z',
-    CPK: 'CPK RESULTS!A:Z'
+    CPK: 'CPK RESULTS!A:Z',
+    STP: 'DGTR STP!A:Z' 
   },
-  POLLING_INTERVAL: 30000 // 30 segundos para verificar cambios
+  POLLING_INTERVAL: 60000 // 30 segundos para verificar cambios
 };
 const thStyleLeft = {
   textAlign: 'left',
@@ -450,14 +455,22 @@ const gaussian = (x, mean, stdDev) => {
         <div className="title">QUALITY DASHBOARD</div>
         
         {/* Indicador de última actualización */}
-        {lastUpdated && (
-          <div className="last-updated">
-            Last update: {lastUpdated.toLocaleTimeString()}
-            <button onClick={loadAllData} className="refresh-button">
-            Update
-            </button>
-          </div>
-        )}
+{lastUpdated && (
+  <div className="last-updated">
+    Last update: {lastUpdated.toLocaleTimeString()}
+    
+    <button onClick={loadAllData} className="refresh-button">
+      Update
+    </button>
+
+    <Link to="/pmp">
+      <button className="refresh-button">
+        Dashboard PMP
+      </button>
+    </Link>
+  </div>
+)}
+
 
         {loading && (
           <div className="loading-overlay">
