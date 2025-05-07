@@ -41,8 +41,8 @@ const ChartComponent = ({ data, dataKey, color, multiLineKeys = [], colors = [],
         />
 
         <YAxis
-          domain={[0.75, 1]} // De 75% a 100%
-          ticks={[0.75, 0.80, 0.85, 0.90, 0.95, 1]} // Incrementos de 5%
+          domain={[0.90, 1]} // De 75% a 100%
+          ticks={[ 0.90,0.91,0.92,0.93,0.94, 0.95, 1]} // Incrementos de 5%
           tickFormatter={(value) => `${(value * 100).toFixed(0)}%`} // Mostrar como 75%, 80%, etc.
           tick={{ fontSize: 8 }}
           allowDataOverflow={true}
