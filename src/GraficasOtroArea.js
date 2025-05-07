@@ -228,7 +228,7 @@ function GraficasOtroArea() {
 
         <div className="second-row" style={{ gap: "10px" }}>
           <div className="glass-card issues-card" style={{ width: '50%', height: '190px' }}>
-            <h3>TOP ISSUES APRIL 2025 - INJECTION</h3>
+            <h3>CURRENT MONTH TOP ISSUES 2025 - INJECTION</h3>
             {topIssuesInjection.length > 0 ? (
               renderSingleIssue(topIssuesInjection, fadeInjection)
             ) : (
@@ -237,7 +237,7 @@ function GraficasOtroArea() {
           </div>
 
           <div className="glass-card issues-card" style={{ width: '50%', height: '190px' }}>
-            <h3>TOP ISSUES APRIL 2025 - STAMPING</h3>
+            <h3>CURRENT MONTH TOP ISSUES 2025 - STAMPING</h3>
             {topIssuesStp.length > 0 ? (
               renderSingleIssue(topIssuesStp, fadeStp)
             ) : (
