@@ -52,7 +52,7 @@ function GraficasOtroArea() {
             const obj = {};
             headers.forEach((header, index) => obj[header] = row[index] || '');
             return {
-              week: obj["WEEK"] || `Semana`,
+              week: obj["DAY"] || `Dia`,
               dgrt: parseFloat(obj["DGTR"]) || 0,
               TGT: parseFloat(obj["TGT"]) || 0,
               dgrtDisplay: `${((parseFloat(obj["DGTR"]) || 0) * 100).toFixed(2)}%`,
@@ -69,7 +69,7 @@ function GraficasOtroArea() {
             const obj = {};
             headers.forEach((header, index) => obj[header] = row[index] || '');
             return {
-              week: obj["WEEK"] || "Semana",
+              week: obj["DAY"] || "Dia",
               dayShift: parseFloat(obj["DAY SHIFT"]) || 0,
               nightShift: parseFloat(obj["NIGHT SHIFT"]) || 0,
               tgt: parseFloat(obj["TGT"]) || 0

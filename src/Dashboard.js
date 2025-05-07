@@ -276,7 +276,7 @@ const gaussian = (x, mean, stdDev) => {
           const tgtValue = parseFloat(obj["TGT"]) || 0; 
 
           return {
-            week: obj["WEEK"] || `Semana ${rows.indexOf(row) + 1}`,
+            week: obj["DAY"] || `Dia ${rows.indexOf(row) + 1}`,
             dgrt: dgrtValue,
             TGT: tgtValue,
             dgrtDisplay: `${(dgrtValue * 100).toFixed(2)}%`, // Versión en porcentaje
@@ -299,7 +299,7 @@ const gaussian = (x, mean, stdDev) => {
             obj[header] = row[index] || '';
           });
           return {
-            week: obj["WEEK"] || `Semana ${rows.indexOf(row) + 1}`,
+            week: obj["DAY"] || `Dia ${rows.indexOf(row) + 1}`,
             dayShift: parseFloat(obj["DAY SHIFT"]) || 0,
             nightShift: parseFloat(obj["NIGHT SHIFT"]) || 0,
             tgt: parseFloat(obj["TGT"]) || 0,
