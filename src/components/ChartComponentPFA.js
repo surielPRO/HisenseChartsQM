@@ -15,7 +15,7 @@ const ChartComponentPFA = ({ data, multiLineKeys = [], colors = [] }) => {
         <XAxis
           dataKey="week"
           label={{
-            value: "Week",
+            value: "Day",
             position: "insideBottom",
             offset: 0,
             style: {

@@ -28,7 +28,7 @@ const ChartComponent = ({ data, dataKey, color, multiLineKeys = [], colors = [],
         <XAxis
           dataKey="week"
           label={{
-            value: "Week",
+            value: "Day",
             position: "insideBottom",
             offset: 0,
             style: {
@@ -61,7 +61,7 @@ const ChartComponent = ({ data, dataKey, color, multiLineKeys = [], colors = [],
       name === 'dgrt' ? 'DGTR' : name;
     return [formatPercentage(value), displayName];
   }}
-  labelFormatter={(label) => `Week: ${label}`}
+  labelFormatter={(label) => `Day: ${label}`}
   contentStyle={{
     background: 'rgba(30, 30, 30, 0.95)',
     border: '1px solid rgba(255, 255, 255, 0.2)',
